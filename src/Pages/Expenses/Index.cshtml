@@ -1,0 +1,37 @@
+@page
+@model ExpenseApp.Pages.Expenses.IndexModel
+@{ViewData["Title"] = "All Expenses";}
+<div class="d-flex justify-content-between mb-3">
+    <form method="get" class="d-flex gap-2">
+        <select name="status" class="form-select form-select-sm" style="width:160px" onchange="this.form.submit()">
+            <option value="">All Statuses</option>
+            @foreach (var s in Model.Statuses) { <option value="@s.StatusName" selected="@(Model.StatusFilter==s.StatusName)">@s.StatusName</option> }
+        </select>
+        <select name="userId" class="form-select form-select-sm" style="width:160px" onchange="this.form.submit()">
+            <option value="">All Users</option>
+            @foreach (var u in Model.Users) { <option value="@u.UserId" selected="@(Model.UserFilter==u.UserId)">@u.UserName</option> }
+        </select>
+    </form>
+    <a asp-page="/Expenses/Create" class="btn btn-primary btn-sm"><i class="bi bi-plus-lg me-1"></i>New</a>
+</div>
+<div class="card">
+    <div class="card-body p-0">
+        <table class="table table-hover mb-0">
+            <thead><tr><th>ID</th><th>User</th><th>Category</th><th>Amount</th><th>Date</th><th>Status</th><th>Description</th><th></th></tr></thead>
+            <tbody>
+            @foreach (var e in Model.Expenses) {
+                <tr>
+                    <td class="text-muted">#@e.ExpenseId</td>
+                    <td>@e.UserName</td>
+                    <td>@e.CategoryName</td>
+                    <td class="fw-semibold">£@e.AmountGBP.ToString("N2")</td>
+                    <td>@e.ExpenseDate.ToString("dd MMM yyyy")</td>
+                    <td><span class="badge badge-@e.StatusName.ToLower()">@e.StatusName</span></td>
+                    <td class="text-muted text-truncate" style="max-width:200px">@e.Description</td>
+                    <td><a asp-page="/Expenses/Detail" asp-route-id="@e.ExpenseId" class="btn btn-sm btn-outline-secondary"><i class="bi bi-eye"></i></a></td>
+                </tr>
+            }
+            </tbody>
+        </table>
+    </div>
+</div>
