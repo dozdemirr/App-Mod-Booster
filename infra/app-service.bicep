@@ -1,5 +1,5 @@
 @description('Location for resources')
-param location string = 'uksouth'
+param location string = 'swedencentral'
 
 var uniqueSuffix = uniqueString(resourceGroup().id)
 var appServicePlanName = 'asp-${uniqueSuffix}'
