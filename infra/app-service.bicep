@@ -1,4 +1,4 @@
-@description('Location for resources')
+@description('Azure region for all resources (Sweden Central)')
 param location string = 'swedencentral'
 
 var uniqueSuffix = uniqueString(resourceGroup().id)
