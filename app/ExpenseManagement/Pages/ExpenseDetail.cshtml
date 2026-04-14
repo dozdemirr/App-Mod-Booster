@@ -1,0 +1,114 @@
+@page
+@model ExpenseDetailModel
+@{
+    ViewData["Title"] = "Expense Details";
+    ViewData["ActivePage"] = "Expenses";
+    var expense = Model.Expense;
+}
+
+<div class="page-header">
+    <div style="display:flex;align-items:center;gap:12px">
+        <a href="/Expenses" class="btn btn-secondary btn-sm">← Back</a>
+        <div>
+            <h1>Expense #@expense?.ExpenseId</h1>
+            <p>@expense?.Description</p>
+        </div>
+    </div>
+</div>
+
+@if (expense != null)
+{
+    <div class="card" style="margin-bottom:20px">
+        <div class="card-header">
+            <h2>Details</h2>
+            <span class="badge badge-@expense.StatusName.ToLower()">@expense.StatusName</span>
+        </div>
+        <div class="card-body">
+            <div class="detail-grid">
+                <div class="detail-item">
+                    <div class="detail-label">Employee</div>
+                    <div class="detail-value">@expense.UserName</div>
+                </div>
+                <div class="detail-item">
+                    <div class="detail-label">Category</div>
+                    <div class="detail-value">@expense.CategoryName</div>
+                </div>
+                <div class="detail-item">
+                    <div class="detail-label">Amount</div>
+                    <div class="detail-value amount" style="font-size:20px">£@expense.AmountGBP.ToString("N2")</div>
+                </div>
+                <div class="detail-item">
+                    <div class="detail-label">Currency</div>
+                    <div class="detail-value">@expense.Currency</div>
+                </div>
+                <div class="detail-item">
+                    <div class="detail-label">Expense Date</div>
+                    <div class="detail-value">@expense.ExpenseDate.ToString("dd MMMM yyyy")</div>
+                </div>
+                <div class="detail-item">
+                    <div class="detail-label">Created</div>
+                    <div class="detail-value">@expense.CreatedAt.ToString("dd MMM yyyy HH:mm")</div>
+                </div>
+                @if (expense.SubmittedAt.HasValue)
+                {
+                    <div class="detail-item">
+                        <div class="detail-label">Submitted</div>
+                        <div class="detail-value">@expense.SubmittedAt.Value.ToString("dd MMM yyyy HH:mm")</div>
+                    </div>
+                }
+                @if (expense.ReviewedByName != null)
+                {
+                    <div class="detail-item">
+                        <div class="detail-label">Reviewed By</div>
+                        <div class="detail-value">@expense.ReviewedByName</div>
+                    </div>
+                }
+                @if (expense.ReviewedAt.HasValue)
+                {
+                    <div class="detail-item">
+                        <div class="detail-label">Reviewed At</div>
+                        <div class="detail-value">@expense.ReviewedAt.Value.ToString("dd MMM yyyy HH:mm")</div>
+                    </div>
+                }
+                @if (!string.IsNullOrEmpty(expense.ReceiptFile))
+                {
+                    <div class="detail-item">
+                        <div class="detail-label">Receipt</div>
+                        <div class="detail-value">@expense.ReceiptFile</div>
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+
+    <div style="display:flex;gap:8px">
+        @if (expense.StatusName == "Draft")
+        {
+            <form method="post" asp-page-handler="Submit">
+                <input type="hidden" name="id" value="@expense.ExpenseId" />
+                <button type="submit" class="btn btn-primary">Submit for Approval</button>
+            </form>
+            <form method="post" asp-page-handler="Delete" onsubmit="return confirm('Delete this expense?')">
+                <input type="hidden" name="id" value="@expense.ExpenseId" />
+                <button type="submit" class="btn btn-danger">Delete</button>
+            </form>
+        }
+        @if (expense.StatusName == "Submitted")
+        {
+            <form method="post" asp-page-handler="Approve">
+                <input type="hidden" name="id" value="@expense.ExpenseId" />
+                <input type="hidden" name="reviewedBy" value="1" />
+                <button type="submit" class="btn btn-success">Approve</button>
+            </form>
+            <form method="post" asp-page-handler="Reject">
+                <input type="hidden" name="id" value="@expense.ExpenseId" />
+                <input type="hidden" name="reviewedBy" value="1" />
+                <button type="submit" class="btn btn-danger">Reject</button>
+            </form>
+        }
+    </div>
+}
+else
+{
+    <div class="card"><div class="card-body"><div class="empty-state"><p>Expense not found.</p></div></div></div>
+}

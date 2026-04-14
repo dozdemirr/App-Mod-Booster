@@ -1,0 +1,92 @@
+@page
+@model UsersModel
+@{
+    ViewData["Title"] = "Users";
+    ViewData["ActivePage"] = "Users";
+}
+
+<div class="page-header">
+    <div style="display:flex;justify-content:space-between;align-items:flex-start">
+        <div>
+            <h1>Users</h1>
+            <p>Manage employee and manager accounts</p>
+        </div>
+        <button class="btn btn-primary" onclick="document.getElementById('addUserModal').classList.add('active')">+ Add User</button>
+    </div>
+</div>
+
+<div class="card">
+    <table>
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Name</th>
+                <th>Email</th>
+                <th>Role</th>
+                <th>Manager</th>
+                <th>Status</th>
+                <th>Joined</th>
+            </tr>
+        </thead>
+        <tbody>
+            @if (!Model.Users.Any())
+            {
+                <tr><td colspan="7"><div class="empty-state"><p>No users found</p></div></td></tr>
+            }
+            @foreach (var user in Model.Users)
+            {
+                <tr>
+                    <td>#@user.UserId</td>
+                    <td>@user.UserName</td>
+                    <td>@user.Email</td>
+                    <td><span class="badge badge-@user.RoleName.ToLower()">@user.RoleName</span></td>
+                    <td>@(user.ManagerName ?? "—")</td>
+                    <td><span class="badge @(user.IsActive ? "badge-active" : "badge-inactive")">@(user.IsActive ? "Active" : "Inactive")</span></td>
+                    <td>@user.CreatedAt.ToString("dd MMM yyyy")</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>
+
+<div class="modal-overlay" id="addUserModal">
+    <div class="modal">
+        <div class="modal-header">
+            <h3>Add New User</h3>
+            <button class="modal-close" onclick="document.getElementById('addUserModal').classList.remove('active')">×</button>
+        </div>
+        <form method="post" asp-page-handler="Create">
+            <div class="modal-body">
+                <div class="form-group">
+                    <label class="form-label">Full Name</label>
+                    <input type="text" name="userName" class="form-control" required placeholder="Jane Smith" />
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Email Address</label>
+                    <input type="email" name="email" class="form-control" required placeholder="jane@company.com" />
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Role</label>
+                    <select name="roleId" class="form-control" required>
+                        <option value="1">Employee</option>
+                        <option value="2">Manager</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Manager (optional)</label>
+                    <select name="managerId" class="form-control">
+                        <option value="">None</option>
+                        @foreach (var user in Model.Users.Where(u => u.RoleName == "Manager"))
+                        {
+                            <option value="@user.UserId">@user.UserName</option>
+                        }
+                    </select>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" onclick="document.getElementById('addUserModal').classList.remove('active')">Cancel</button>
+                <button type="submit" class="btn btn-primary">Create User</button>
+            </div>
+        </form>
+    </div>
+</div>
