@@ -408,14 +408,15 @@ AS
 BEGIN
     SET NOCOUNT ON;
 
+    -- Totals are calculated per (StatusName, Currency) to avoid mixing currencies
     SELECT
         s.StatusName,
-        COUNT(e.ExpenseId)                              AS ExpenseCount,
-        CAST(SUM(e.AmountMinor) / 100.0 AS DECIMAL(12, 2)) AS TotalAmount,
-        e.Currency
+        e.Currency,
+        COUNT(e.ExpenseId)                                  AS ExpenseCount,
+        CAST(SUM(e.AmountMinor) / 100.0 AS DECIMAL(12, 2)) AS TotalAmount
     FROM dbo.Expenses e
     JOIN dbo.ExpenseStatus s ON e.StatusId = s.StatusId
     GROUP BY s.StatusName, e.Currency
-    ORDER BY s.StatusName;
+    ORDER BY s.StatusName, e.Currency;
 END;
 GO
