@@ -19,9 +19,16 @@ async function loadLookups() {
 
     const userSelect = document.getElementById('userId');
     const userFilter = document.getElementById('userFilter');
+    const managerSelect = document.getElementById('managerUserId');
     for (const user of users) {
         userSelect.add(new Option(`${user.userName} (${user.roleName})`, user.userId));
         userFilter.add(new Option(user.userName, user.userId));
+        if ((user.roleName || '').toLowerCase() === 'manager') {
+            managerSelect.add(new Option(user.userName, user.userId));
+        }
+    }
+    if (managerSelect.options.length === 0 && users.length > 0) {
+        managerSelect.add(new Option(users[0].userName, users[0].userId));
     }
 
     const categorySelect = document.getElementById('categoryId');
@@ -66,10 +73,11 @@ async function loadExpenses() {
 }
 
 async function reviewExpense(expenseId, approve) {
+    const managerUserId = Number(document.getElementById('managerUserId').value);
     await getJson(`/api/expenses/${expenseId}/review`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ managerUserId: 2, approve })
+        body: JSON.stringify({ managerUserId, approve })
     });
     await loadExpenses();
 }
