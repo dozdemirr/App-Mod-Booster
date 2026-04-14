@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Expense Chat UI</title>
+    <link rel="stylesheet" href="/chatui/styles.css" />
+</head>
+<body>
+    <main class="shell">
+        <h1>Expense Assistant Chat</h1>
+        <p>Ask in natural language. The assistant uses backend APIs and RAG context.</p>
+        <div id="chat" class="chat"></div>
+        <form id="chat-form" class="composer">
+            <input id="message" autocomplete="off" placeholder="e.g. list submitted expenses for Alice" />
+            <button type="submit">Send</button>
+        </form>
+    </main>
+    <script src="/chatui/script.js"></script>
+</body>
+</html>

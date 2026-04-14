@@ -1,18 +1,79 @@
 ![Header image](https://github.com/DougChisholm/App-Mod-Booster/blob/main/repo-header-booster.png)
 
 # App-Mod-Booster
-A project to show how GitHub coding agent can turn screenshots of a legacy app into a working proof-of-concept for a cloud native Azure replacement if the legacy database schema is also provided.
+A modernized Azure POC for an Expense Management app:
+- .NET 8 Razor Pages UI (`/Index`)
+- API-first backend with Swagger (`/swagger`)
+- SQL access via managed identity + stored procedures only
+- Optional Chat UI (`/chatui/index.html`) with Azure OpenAI function-calling + RAG context
+- Modular Bicep IaC + deployment scripts
 
-Steps to modernise an app:
+## Repository structure
+- `AppModAssist/` - .NET 8 app, APIs, Swagger, Razor UI, chat endpoint
+- `infra/` - modular bicep (`main`, `app-service`, `azure-sql`, `genai`)
+- `Database-Schema/` - schema and stored procedures
+- `chatui/` - chat documentation
+- `RAG/` - retrieval context
+- `deploy.sh` - deploy app + SQL
+- `deploy-with-chat.sh` - deploy app + SQL + GenAI resources
+- `deploy-summary.sh` - summary launcher script
 
-1. Fork this repo 
-2. In new repo replace the screenshots and sql schema (or keep the samples)
-3. Open the coding agent and use app-mod-booster agent telling it "modernise my app"
-4. When the app code is generated (can take up to 30 minutes) there will be a pull request to approve.
-5. Now you can use codespaces to deploy the app to azure (or open VS Code and clone the repo locally - you will need to install some tools locally or use the devcontainer)
-6. Open terminal and type "az login" to set subscription/context
-7. Then type "bash deploy.sh" to deploy the app and db or "bash deploy-with-chat.sh" to deploy the app, db and chat UI.
+## Prerequisites
+- Azure CLI (`az`)
+- .NET 8 SDK
+- Python 3 + pip
+- `jq` and `zip`
+- Azure login: `az login`
 
-Supporting slides for Microsoft Employees:
-[Here](<https://microsofteur-my.sharepoint.com/:p:/g/personal/dchisholm_microsoft_com/IQAY41LQ12fjSIfFz3ha4hfFAZc7JQQuWaOrF7ObgxRK6f4?e=p6arJs>)
-# Modernisation in progress
+## Required environment variables
+```bash
+export RESOURCE_GROUP="rg-appmodassist-poc"
+export ADMIN_OBJECT_ID="<your-entra-object-id>"
+export ADMIN_UPN="<your-upn@domain>"
+export LOCATION="swedencentral"
+```
+
+## One-line deployment
+Standard deployment (app + SQL):
+```bash
+bash deploy-summary.sh
+```
+
+Deployment with chat resources (AOAI + Search):
+```bash
+bash deploy-summary.sh chat
+```
+
+## App URL
+After deployment, open:
+```text
+https://<app-url>/Index
+```
+
+## Local run
+Use local Entra auth for SQL:
+- `AppModAssist/appsettings.Development.json` uses `Authentication=Active Directory Default`
+- Run `az login` first
+
+Then:
+```bash
+dotnet run --project AppModAssist/AppModAssist.csproj
+```
+Open:
+- `https://localhost:xxxx/Index`
+- `https://localhost:xxxx/swagger`
+
+## Managed identity SQL pattern
+Production connection uses:
+```text
+Authentication=Active Directory Managed Identity;User Id=<managed-identity-client-id>;
+```
+Set both app settings:
+- `ManagedIdentityClientId`
+- `AZURE_CLIENT_ID`
+
+## Azure best practices applied
+- Secure-by-default identity access (managed identity over secrets)
+- SQL Entra-only auth
+- Modular IaC with deterministic naming (`uniqueString(resourceGroup().id)`)
+- Separation of responsibilities: infrastructure, app deployment, data setup

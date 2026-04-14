@@ -1,0 +1,130 @@
+﻿@page
+@model IndexModel
+@{
+    ViewData["Title"] = "Expense Workspace";
+}
+
+<div class="hero-card">
+    <h1>Expense Workspace</h1>
+    <p>Modernized expense workflow with API-driven Razor UI.</p>
+</div>
+
+@if (Model.ErrorBanner is not null)
+{
+    <div class="alert alert-warning error-banner">
+        <strong>Fallback mode enabled.</strong> @Model.ErrorBanner.Message
+        @if (!string.IsNullOrWhiteSpace(Model.ErrorBanner.File))
+        {
+            <div><strong>File:</strong> @Model.ErrorBanner.File | <strong>Line:</strong> @Model.ErrorBanner.Line</div>
+        }
+    </div>
+}
+
+<section class="card-grid">
+    <div class="panel-card">
+        <h2>Filters</h2>
+        <form method="get" class="stack">
+            <select class="form-select" asp-for="FilterUserId">
+                <option value="">All users</option>
+                @foreach (var user in Model.Data.Users)
+                {
+                    <option value="@user.Id">@user.Name</option>
+                }
+            </select>
+            <select class="form-select" asp-for="FilterCategoryId">
+                <option value="">All categories</option>
+                @foreach (var category in Model.Data.Categories)
+                {
+                    <option value="@category.Id">@category.Name</option>
+                }
+            </select>
+            <select class="form-select" asp-for="FilterStatusId">
+                <option value="">All statuses</option>
+                @foreach (var status in Model.Data.Statuses)
+                {
+                    <option value="@status.Id">@status.Name</option>
+                }
+            </select>
+            <button class="btn btn-primary" type="submit">Apply Filters</button>
+        </form>
+    </div>
+
+    <div class="panel-card">
+        <h2>Create Expense</h2>
+        <form method="post" asp-page-handler="Create" class="stack">
+            <select asp-for="NewExpense.UserId" class="form-select">
+                @foreach (var user in Model.Data.Users)
+                {
+                    <option value="@user.Id">@user.Name</option>
+                }
+            </select>
+            <select asp-for="NewExpense.CategoryId" class="form-select">
+                @foreach (var category in Model.Data.Categories)
+                {
+                    <option value="@category.Id">@category.Name</option>
+                }
+            </select>
+            <input asp-for="NewExpense.AmountGbp" class="form-control" placeholder="Amount GBP" />
+            <input asp-for="NewExpense.ExpenseDate" class="form-control" type="date" />
+            <input asp-for="NewExpense.Description" class="form-control" placeholder="Description" />
+            <input asp-for="NewExpense.ReceiptFile" class="form-control" placeholder="Receipt path" />
+            <button class="btn btn-success" type="submit">Create Expense</button>
+        </form>
+    </div>
+
+    <div class="panel-card">
+        <h2>Workflow Actions</h2>
+        <form method="post" asp-page-handler="Submit" class="stack mb-3">
+            <input asp-for="SubmitExpenseId" class="form-control" placeholder="Expense ID to submit" />
+            <button class="btn btn-outline-primary" type="submit">Submit Expense</button>
+        </form>
+
+        <form method="post" asp-page-handler="Review" class="stack">
+            <input asp-for="ReviewExpenseId" class="form-control" placeholder="Expense ID to review" />
+            <input asp-for="ReviewedByUserId" class="form-control" placeholder="Reviewer User ID" />
+            <select asp-for="Approve" class="form-select">
+                <option value="true">Approve</option>
+                <option value="false">Reject</option>
+            </select>
+            <input asp-for="ReviewNotes" class="form-control" placeholder="Notes (optional)" />
+            <button class="btn btn-outline-success" type="submit">Apply Review</button>
+        </form>
+    </div>
+</section>
+
+<section class="table-card mt-4">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <h2 class="mb-0">Expenses</h2>
+        <a class="btn btn-dark" href="/chatui/index.html">Open Chat UI</a>
+    </div>
+
+    <div class="table-responsive">
+        <table class="table table-striped">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>User</th>
+                    <th>Category</th>
+                    <th>Status</th>
+                    <th>Amount</th>
+                    <th>Date</th>
+                    <th>Description</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var item in Model.Data.Expenses)
+                {
+                    <tr>
+                        <td>@item.ExpenseId</td>
+                        <td>@item.UserName</td>
+                        <td>@item.CategoryName</td>
+                        <td>@item.StatusName</td>
+                        <td>£@item.AmountGbp</td>
+                        <td>@item.ExpenseDate</td>
+                        <td>@item.Description</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</section>

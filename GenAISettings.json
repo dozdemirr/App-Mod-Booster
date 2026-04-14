@@ -1,0 +1,15 @@
+{
+  "OpenAI": {
+    "Endpoint": "",
+    "DeploymentName": "gpt-4o",
+    "Location": "swedencentral"
+  },
+  "AISearch": {
+    "Endpoint": "",
+    "Sku": "basic"
+  },
+  "ManagedIdentity": {
+    "ClientId": "",
+    "PrincipalId": ""
+  }
+}
