@@ -26,6 +26,10 @@ build_property.EnableCodeStyleSeverity =
 build_metadata.AdditionalFiles.TargetPath = UGFnZXMvQ2F0ZWdvcmllcy5jc2h0bWw=
 build_metadata.AdditionalFiles.CssScope = 
 
+[/home/runner/work/App-Mod-Booster/App-Mod-Booster/app/ExpenseManagement/Pages/Chat.cshtml]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXMvQ2hhdC5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
 [/home/runner/work/App-Mod-Booster/App-Mod-Booster/app/ExpenseManagement/Pages/Error.cshtml]
 build_metadata.AdditionalFiles.TargetPath = UGFnZXMvRXJyb3IuY3NodG1s
 build_metadata.AdditionalFiles.CssScope = 

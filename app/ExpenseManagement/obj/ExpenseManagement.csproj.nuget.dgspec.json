@@ -44,9 +44,13 @@
         "net8.0": {
           "targetAlias": "net8.0",
           "dependencies": {
+            "Azure.AI.OpenAI": {
+              "target": "Package",
+              "version": "[1.0.0-beta.17, )"
+            },
             "Azure.Identity": {
               "target": "Package",
-              "version": "[1.13.2, )"
+              "version": "[1.21.0, )"
             },
             "Microsoft.AspNetCore.Mvc.NewtonsoftJson": {
               "target": "Package",

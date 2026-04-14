@@ -6,6 +6,7 @@ builder.Services.AddRazorPages();
 builder.Services.AddControllers().AddNewtonsoftJson();
 builder.Services.AddScoped<ExpenseService>();
 builder.Services.AddScoped<UserService>();
+builder.Services.AddScoped<ChatService>();
 
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(c =>
