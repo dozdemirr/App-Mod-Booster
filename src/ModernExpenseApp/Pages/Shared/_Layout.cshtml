@@ -1,0 +1,40 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - ModernExpenseApp</title>
+    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/ModernExpenseApp.styles.css" asp-append-version="true" />
+</head>
+<body>
+    <header>
+        <nav class="navbar">
+            <div class="container">
+                <a class="navbar-brand" asp-area="" asp-page="/Index">ModernExpenseApp</a>
+                <div class="nav-links">
+                    <a asp-area="" asp-page="/Index">Home</a>
+                    <a asp-area="" asp-page="/Chat">Chat UI</a>
+                    <a href="/swagger">Swagger</a>
+                </div>
+            </div>
+        </nav>
+    </header>
+    <div id="error-banner" class="error-banner" style="display:none"></div>
+    <div class="container">
+        <main role="main" class="pb-3">
+            @RenderBody()
+        </main>
+    </div>
+
+    <footer class="footer">
+        <div class="container">
+            &copy; 2026 - ModernExpenseApp
+        </div>
+    </footer>
+
+    <script src="~/js/site.js" asp-append-version="true"></script>
+
+    @await RenderSectionAsync("Scripts", required: false)
+</body>
+</html>

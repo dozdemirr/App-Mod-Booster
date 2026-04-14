@@ -1,0 +1,52 @@
+﻿@page
+@{
+    ViewData["Title"] = "Expense Management";
+}
+
+<section class="hero-card">
+    <div>
+        <h1>Modern Expense Management</h1>
+        <p>Submit, filter, approve, and review expenses via API-backed workflows.</p>
+        <p><strong>Azure App URL hint:</strong> open <code>/Index</code> explicitly after deployment.</p>
+    </div>
+    <div class="hero-actions">
+        <a class="btn btn-primary" href="/swagger">Open API + Swagger</a>
+        <a class="btn btn-secondary" href="/Chat">Open Chat UI</a>
+    </div>
+</section>
+
+<section class="panel">
+    <h2>Create expense</h2>
+    <form id="create-expense-form">
+        <div class="row-grid">
+            <label>User <select id="userId" required></select></label>
+            <label>Category <select id="categoryId" required></select></label>
+            <label>Amount (GBP) <input id="amountGbp" type="number" min="0.01" step="0.01" required /></label>
+            <label>Date <input id="expenseDate" type="date" required /></label>
+        </div>
+        <label>Description <input id="description" maxlength="200" /></label>
+        <button class="btn btn-primary" type="submit">Create</button>
+    </form>
+</section>
+
+<section class="panel">
+    <h2>Expense list</h2>
+    <div class="row-grid">
+        <label>Filter by status <select id="statusFilter"><option value="">All</option></select></label>
+        <label>Filter by user <select id="userFilter"><option value="">All</option></select></label>
+        <label>Reviewer (manager) <select id="managerUserId"></select></label>
+    </div>
+    <button class="btn btn-secondary" id="reload-btn" type="button">Reload</button>
+    <div class="table-wrap">
+        <table>
+            <thead>
+                <tr>
+                    <th>ID</th><th>User</th><th>Category</th><th>Status</th><th>Amount</th><th>Date</th><th>Description</th><th>Actions</th>
+                </tr>
+            </thead>
+            <tbody id="expenses-body"></tbody>
+        </table>
+    </div>
+</section>
+
+<script src="~/js/index.js" asp-append-version="true"></script>
