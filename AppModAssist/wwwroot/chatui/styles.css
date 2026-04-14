@@ -1,0 +1,9 @@
+body { font-family: Arial, sans-serif; background: #eef3fb; margin: 0; }
+.shell { max-width: 840px; margin: 1rem auto; background: #fff; border-radius: 12px; padding: 1rem; }
+.chat { min-height: 420px; max-height: 420px; overflow-y: auto; border: 1px solid #e1e4ee; border-radius: 10px; padding: 1rem; background: #fafbfd; }
+.bubble { margin-bottom: .75rem; padding: .7rem; border-radius: 10px; white-space: normal; }
+.user { background: #dbe7ff; text-align: right; }
+.assistant { background: #f1f5ff; }
+.composer { display: grid; grid-template-columns: 1fr auto; gap: .5rem; margin-top: .8rem; }
+input { padding: .7rem; border-radius: 8px; border: 1px solid #c8d1e7; }
+button { border: 0; background: #3458e6; color: #fff; padding: .7rem 1rem; border-radius: 8px; }

@@ -1,0 +1,7 @@
+bin/
+obj/
+app/
+*.user
+*.suo
+*.bak
+!*.zip
