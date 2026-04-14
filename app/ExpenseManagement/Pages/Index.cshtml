@@ -1,0 +1,61 @@
+@page
+@model IndexModel
+@{
+    ViewData["Title"] = "Dashboard";
+    ViewData["ActivePage"] = "Dashboard";
+}
+
+<div class="page-header">
+    <h1>Dashboard</h1>
+    <p>Expense management overview</p>
+</div>
+
+<div class="stats-grid">
+    @foreach (var item in Model.Summary)
+    {
+        var cssClass = item.StatusName.ToLower();
+        <div class="stat-card @cssClass">
+            <div class="stat-value">@item.Count</div>
+            <div class="stat-label">@item.StatusName</div>
+            <div class="stat-amount">£@item.TotalAmountGBP.ToString("N2")</div>
+        </div>
+    }
+</div>
+
+<div class="card">
+    <div class="card-header">
+        <h2>Recent Expenses</h2>
+        <a href="/Expenses" class="btn btn-primary btn-sm">View All</a>
+    </div>
+    <table>
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Employee</th>
+                <th>Category</th>
+                <th>Amount</th>
+                <th>Status</th>
+                <th>Date</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            @if (!Model.RecentExpenses.Any())
+            {
+                <tr><td colspan="7"><div class="empty-state"><p>No expenses found</p></div></td></tr>
+            }
+            @foreach (var expense in Model.RecentExpenses)
+            {
+                <tr>
+                    <td>#@expense.ExpenseId</td>
+                    <td>@expense.UserName</td>
+                    <td>@expense.CategoryName</td>
+                    <td class="amount">£@expense.AmountGBP.ToString("N2")</td>
+                    <td><span class="badge badge-@expense.StatusName.ToLower()">@expense.StatusName</span></td>
+                    <td>@expense.ExpenseDate.ToString("dd MMM yyyy")</td>
+                    <td><a href="/ExpenseDetail?id=@expense.ExpenseId" class="btn btn-secondary btn-xs">View</a></td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>
