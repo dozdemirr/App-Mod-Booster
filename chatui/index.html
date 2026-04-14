@@ -1,0 +1,21 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Expense Chat UI</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <div class="shell">
+    <h1>Expense Assistant</h1>
+    <p>Ask for expense lists, create expenses, or review submitted items.</p>
+    <div id="messages" class="messages"></div>
+    <form id="chat-form">
+      <input id="prompt" placeholder="Example: list submitted expenses for Alice" required />
+      <button type="submit">Send</button>
+    </form>
+  </div>
+  <script src="app.js"></script>
+</body>
+</html>
