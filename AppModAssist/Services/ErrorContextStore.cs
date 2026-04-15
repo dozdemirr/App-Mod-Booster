@@ -4,7 +4,7 @@ namespace AppModAssist.Services;
 
 public sealed class ErrorContextStore
 {
-    private readonly Lock _lock = new();
+    private readonly object _lock = new();
     private UiErrorDetails? _latest;
 
     public void Set(string message)
