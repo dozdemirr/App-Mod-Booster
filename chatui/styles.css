@@ -1,0 +1,6 @@
+body { font-family: Arial, sans-serif; background: #f2f4f8; margin: 0; padding: 2rem; }
+main { max-width: 800px; margin: 0 auto; background: #fff; border-radius: 12px; padding: 1rem; }
+.messages { min-height: 300px; border: 1px solid #d8deea; padding: 1rem; border-radius: 10px; margin-bottom: 1rem; }
+.message { margin-bottom: .75rem; padding: .6rem; border-radius: .6rem; }
+.user { background: #d9edff; }
+.bot { background: #eef2f7; }

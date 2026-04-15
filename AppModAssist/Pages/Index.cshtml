@@ -1,0 +1,67 @@
+@page
+@model IndexModel
+@{
+    ViewData["Title"] = "Expense Management";
+}
+
+<div id="errorBanner" class="alert alert-danger d-none" role="alert"></div>
+
+<section class="hero mb-4 p-4 rounded-4 shadow-sm">
+    <div class="d-flex justify-content-between align-items-center flex-wrap gap-2">
+        <div>
+            <h1 class="display-6 mb-1">Expense Management Portal</h1>
+            <p class="mb-0 text-secondary">Modernized .NET 8 app powered by API-first architecture and managed identity.</p>
+            <p class="mb-0 text-secondary small">Use <strong>/Index</strong> URL when opening the app in Azure App Service.</p>
+        </div>
+        <div class="d-flex gap-2">
+            <a class="btn btn-primary" asp-page="/Chat/Index">Open Chat UI</a>
+            <a class="btn btn-outline-primary" href="/swagger" target="_blank">Open Swagger</a>
+        </div>
+    </div>
+</section>
+
+<section class="row g-3 mb-4">
+    <div class="col-lg-4">
+        <div class="card h-100">
+            <div class="card-body">
+                <h2 class="h5">Create Expense</h2>
+                <form id="createExpenseForm" class="d-flex flex-column gap-2">
+                    <select id="userId" class="form-select" required></select>
+                    <select id="categoryId" class="form-select" required></select>
+                    <input id="amountMinor" class="form-control" type="number" min="1" placeholder="Amount (pence)" required />
+                    <input id="expenseDate" class="form-control" type="date" required />
+                    <textarea id="description" class="form-control" placeholder="Description"></textarea>
+                    <button class="btn btn-success" type="submit">Submit Expense</button>
+                </form>
+            </div>
+        </div>
+    </div>
+    <div class="col-lg-8">
+        <div class="card h-100">
+            <div class="card-body">
+                <h2 class="h5">Filter Expenses</h2>
+                <div class="row g-2 mb-3">
+                    <div class="col-md-4"><select id="filterStatus" class="form-select"></select></div>
+                    <div class="col-md-4"><select id="filterUser" class="form-select"></select></div>
+                    <div class="col-md-4"><select id="filterCategory" class="form-select"></select></div>
+                </div>
+                <button id="refreshBtn" class="btn btn-outline-secondary btn-sm mb-3">Refresh</button>
+
+                <div class="table-responsive">
+                    <table class="table table-striped align-middle" id="expenseTable">
+                        <thead>
+                            <tr>
+                                <th>ID</th><th>User</th><th>Category</th><th>Status</th><th>Amount</th><th>Date</th><th>Action</th>
+                            </tr>
+                        </thead>
+                        <tbody></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+@section Scripts {
+    <script src="~/js/index.js" asp-append-version="true"></script>
+}

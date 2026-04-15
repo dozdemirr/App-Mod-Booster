@@ -1,0 +1,20 @@
+@page
+@model AppModAssist.Pages.Chat.IndexModel
+@{
+    ViewData["Title"] = "Chat UI";
+}
+
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <h1 class="h4">GenAI Chat UI</h1>
+    <a class="btn btn-outline-secondary" asp-page="/Index">Back to Expenses</a>
+</div>
+
+<div id="chatMessages" class="chat-window mb-3"></div>
+<form id="chatForm" class="d-flex gap-2">
+    <input id="chatInput" class="form-control" placeholder="Ask about expenses..." required />
+    <button class="btn btn-primary" type="submit">Send</button>
+</form>
+
+@section Scripts {
+    <script src="~/js/chat.js" asp-append-version="true"></script>
+}

@@ -1,0 +1,11 @@
+{
+  "OpenAI": {
+    "Region": "swedencentral",
+    "Model": "gpt-4o",
+    "Sku": "Standard",
+    "Capacity": 8
+  },
+  "AISearch": {
+    "Sku": "basic"
+  }
+}
