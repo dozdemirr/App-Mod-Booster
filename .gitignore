@@ -1,0 +1,25 @@
+## build outputs
+app/bin/
+app/obj/
+app/publish/
+
+## Intentionally NOT excluding app.zip so it can be committed for deployment
+# app.zip  <-- do NOT add this line; app.zip must be committable
+
+## Python
+__pycache__/
+*.pyc
+*.pyo
+.env
+
+## Local SQL backup files (from cross-platform sed replacement)
+*.bak
+
+## VS Code
+.vscode/
+
+## macOS
+.DS_Store
+
+## Rider / JetBrains
+.idea/

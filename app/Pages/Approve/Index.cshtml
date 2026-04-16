@@ -1,0 +1,169 @@
+@page
+@model ExpenseMgmt.Pages.Approve.ApproveModel
+@{
+    ViewData["Title"] = "Approve Expenses";
+}
+
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+        <h1 class="h2 fw-bold text-primary"><i class="bi bi-check2-circle me-2"></i>Approve Expenses</h1>
+        <p class="text-muted mb-0">Review and action pending expense claims</p>
+    </div>
+    <span class="badge bg-warning text-dark fs-6 px-3 py-2">
+        @Model.PendingExpenses.Count pending
+    </span>
+</div>
+
+@if (!string.IsNullOrEmpty(Model.StatusMessage))
+{
+    <div class="alert alert-success alert-dismissible fade show">
+        <i class="bi bi-check-circle me-2"></i>@Model.StatusMessage
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+}
+
+@* Filter + Reviewer *@
+<div class="card border-0 shadow-sm mb-4">
+    <div class="card-body">
+        <form method="get" class="row g-3 align-items-end">
+            <div class="col-md-5">
+                <label class="form-label fw-semibold small text-muted">Filter Pending Expenses</label>
+                <div class="input-group">
+                    <span class="input-group-text bg-white"><i class="bi bi-search text-muted"></i></span>
+                    <input type="text" name="filter" value="@Model.Filter" class="form-control"
+                           placeholder="Search by employee, category or description..." />
+                </div>
+            </div>
+            <div class="col-md-4">
+                <label class="form-label fw-semibold small text-muted">Reviewing As (Manager)</label>
+                <select name="reviewerId" class="form-select">
+                    @foreach (var u in Model.Managers)
+                    {
+                        <option value="@u.UserId" selected="@(Model.SelectedReviewerId == u.UserId ? "selected" : null)">
+                            @u.UserName
+                        </option>
+                    }
+                </select>
+            </div>
+            <div class="col-auto">
+                <button type="submit" class="btn btn-primary">
+                    <i class="bi bi-funnel me-1"></i>Filter
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+@* Pending Expenses Table *@
+<div class="card border-0 shadow-sm">
+    <div class="card-header bg-white border-bottom py-3">
+        <span class="fw-semibold text-muted">Pending Expenses</span>
+    </div>
+    <div class="card-body p-0">
+        <div class="table-responsive">
+            <table class="table table-hover mb-0">
+                <thead class="table-light">
+                    <tr>
+                        <th><input type="checkbox" id="selectAll" class="form-check-input" /></th>
+                        <th>Date</th>
+                        <th>Employee</th>
+                        <th>Category</th>
+                        <th>Description</th>
+                        <th class="text-end">Amount (£)</th>
+                        <th>Submitted</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var exp in Model.PendingExpenses)
+                    {
+                        <tr>
+                            <td>
+                                <input type="checkbox" class="form-check-input expense-checkbox"
+                                       value="@exp.ExpenseId" />
+                            </td>
+                            <td>@exp.ExpenseDate.ToString("dd/MM/yyyy")</td>
+                            <td><span class="fw-semibold">@exp.UserName</span></td>
+                            <td><span class="badge bg-light text-dark border">@exp.CategoryName</span></td>
+                            <td class="text-truncate" style="max-width:180px" title="@exp.Description">@exp.Description</td>
+                            <td class="text-end fw-bold text-success">£@exp.AmountGBP.ToString("N2")</td>
+                            <td class="text-muted small">@exp.SubmittedAt?.ToString("dd/MM/yyyy HH:mm")</td>
+                            <td>
+                                <form method="post" asp-page-handler="Approve" class="d-inline">
+                                    <input type="hidden" name="expenseId" value="@exp.ExpenseId" />
+                                    <input type="hidden" name="reviewerId" value="@Model.SelectedReviewerId" />
+                                    <button type="submit" class="btn btn-sm btn-success me-1" title="Approve">
+                                        <i class="bi bi-check-lg"></i> Approve
+                                    </button>
+                                </form>
+                                <form method="post" asp-page-handler="Reject" class="d-inline">
+                                    <input type="hidden" name="expenseId" value="@exp.ExpenseId" />
+                                    <input type="hidden" name="reviewerId" value="@Model.SelectedReviewerId" />
+                                    <input type="hidden" name="rejectionReason" value="Does not meet policy requirements" />
+                                    <button type="submit" class="btn btn-sm btn-outline-danger" title="Reject">
+                                        <i class="bi bi-x-lg"></i> Reject
+                                    </button>
+                                </form>
+                            </td>
+                        </tr>
+                    }
+                    @if (!Model.PendingExpenses.Any())
+                    {
+                        <tr>
+                            <td colspan="8" class="text-center text-muted py-5">
+                                <i class="bi bi-check2-all fs-1 d-block mb-2 text-success"></i>
+                                <strong>All caught up!</strong> No pending expenses to review.
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+    @if (Model.PendingExpenses.Any())
+    {
+        <div class="card-footer bg-white border-top py-3 d-flex justify-content-between align-items-center">
+            <span class="text-muted small" id="selectedCount">0 selected</span>
+            <div>
+                <button type="button" class="btn btn-success me-2" id="approveSelected" disabled>
+                    <i class="bi bi-check-all me-1"></i>Approve Selected
+                </button>
+                <button type="button" class="btn btn-outline-danger" id="rejectSelected" disabled>
+                    <i class="bi bi-x-circle me-1"></i>Reject Selected
+                </button>
+            </div>
+        </div>
+    }
+</div>
+
+@section Scripts {
+<script>
+// Select all checkbox
+document.getElementById('selectAll')?.addEventListener('change', function() {
+    document.querySelectorAll('.expense-checkbox').forEach(cb => cb.checked = this.checked);
+    updateBulkButtons();
+});
+document.querySelectorAll('.expense-checkbox').forEach(cb => {
+    cb.addEventListener('change', updateBulkButtons);
+});
+function updateBulkButtons() {
+    const checked = document.querySelectorAll('.expense-checkbox:checked').length;
+    document.getElementById('selectedCount').textContent = checked + ' selected';
+    document.getElementById('approveSelected').disabled = checked === 0;
+    document.getElementById('rejectSelected').disabled = checked === 0;
+}
+
+// Bulk approve/reject via individual forms
+document.getElementById('approveSelected')?.addEventListener('click', function() {
+    document.querySelectorAll('.expense-checkbox:checked').forEach(cb => {
+        // Create and submit a form for each selected expense
+        const form = document.createElement('form');
+        form.method = 'post';
+        form.action = '?handler=Approve';
+        form.innerHTML = `<input name="expenseId" value="${cb.value}" /><input name="reviewerId" value="@Model.SelectedReviewerId" />`;
+        document.body.appendChild(form);
+        form.submit();
+    });
+});
+</script>
+}

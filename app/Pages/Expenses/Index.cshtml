@@ -1,0 +1,136 @@
+@page
+@model ExpenseMgmt.Pages.Expenses.ExpensesIndexModel
+@{
+    ViewData["Title"] = "My Expenses";
+}
+
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+        <h1 class="h2 fw-bold text-primary"><i class="bi bi-list-ul me-2"></i>My Expenses</h1>
+        <p class="text-muted mb-0">View and manage your expense claims</p>
+    </div>
+    <a asp-page="/Expenses/Add" class="btn btn-primary">
+        <i class="bi bi-plus-circle me-1"></i>Add Expense
+    </a>
+</div>
+
+@* Filter Bar *@
+<div class="card border-0 shadow-sm mb-4">
+    <div class="card-body">
+        <form method="get" class="row g-3 align-items-end">
+            <div class="col-md-5">
+                <label class="form-label fw-semibold small text-muted">Filter</label>
+                <div class="input-group">
+                    <span class="input-group-text bg-white"><i class="bi bi-search text-muted"></i></span>
+                    <input type="text" name="filter" value="@Model.Filter" class="form-control" placeholder="Search by category, status or description..." />
+                </div>
+            </div>
+            <div class="col-md-3">
+                <label class="form-label fw-semibold small text-muted">User</label>
+                <select name="userId" class="form-select">
+                    <option value="">All Users</option>
+                    @foreach (var u in Model.Users)
+                    {
+                        <option value="@u.UserId" selected="@(Model.SelectedUserId == u.UserId ? "selected" : null)">
+                            @u.UserName (@u.RoleName)
+                        </option>
+                    }
+                </select>
+            </div>
+            <div class="col-auto">
+                <button type="submit" class="btn btn-primary">
+                    <i class="bi bi-funnel me-1"></i>Filter
+                </button>
+                <a asp-page="/Expenses/Index" class="btn btn-outline-secondary ms-1">
+                    <i class="bi bi-x-circle me-1"></i>Clear
+                </a>
+            </div>
+        </form>
+    </div>
+</div>
+
+@* Expenses Table *@
+<div class="card border-0 shadow-sm">
+    <div class="card-header bg-white border-bottom py-3 d-flex justify-content-between">
+        <span class="fw-semibold">@Model.Expenses.Count expense(s)</span>
+    </div>
+    <div class="card-body p-0">
+        <div class="table-responsive">
+            <table class="table table-hover mb-0">
+                <thead class="table-light">
+                    <tr>
+                        <th>Date</th>
+                        <th>Category</th>
+                        <th>Description</th>
+                        <th class="text-end">Amount (£)</th>
+                        <th>Status</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var exp in Model.Expenses)
+                    {
+                        <tr>
+                            <td>@exp.ExpenseDate.ToString("dd/MM/yyyy")</td>
+                            <td><span class="badge bg-light text-dark border">@exp.CategoryName</span></td>
+                            <td class="text-truncate" style="max-width:220px" title="@exp.Description">@exp.Description</td>
+                            <td class="text-end fw-semibold">£@exp.AmountGBP.ToString("N2")</td>
+                            <td>@Html.Raw(GetStatusBadge(exp.StatusName))</td>
+                            <td>
+                                @if (exp.StatusName == "Draft")
+                                {
+                                    <form method="post" asp-page-handler="Submit" class="d-inline">
+                                        <input type="hidden" name="expenseId" value="@exp.ExpenseId" />
+                                        <input type="hidden" name="userId" value="@exp.UserId" />
+                                        <button type="submit" class="btn btn-sm btn-warning me-1" title="Submit for approval">
+                                            <i class="bi bi-send"></i>
+                                        </button>
+                                    </form>
+                                    <form method="post" asp-page-handler="Delete" class="d-inline"
+                                          onsubmit="return confirm('Delete this draft expense?')">
+                                        <input type="hidden" name="expenseId" value="@exp.ExpenseId" />
+                                        <input type="hidden" name="userId" value="@exp.UserId" />
+                                        <button type="submit" class="btn btn-sm btn-outline-danger" title="Delete draft">
+                                            <i class="bi bi-trash"></i>
+                                        </button>
+                                    </form>
+                                }
+                                else
+                                {
+                                    <span class="text-muted small">—</span>
+                                }
+                            </td>
+                        </tr>
+                    }
+                    @if (!Model.Expenses.Any())
+                    {
+                        <tr>
+                            <td colspan="6" class="text-center text-muted py-5">
+                                <i class="bi bi-inbox fs-1 d-block mb-2 text-muted"></i>
+                                No expenses found. <a asp-page="/Expenses/Add">Add your first expense</a>.
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+@if (!string.IsNullOrEmpty(Model.StatusMessage))
+{
+    <div class="alert alert-info mt-3 alert-dismissible fade show">
+        @Model.StatusMessage
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+}
+
+@functions {
+    string GetStatusBadge(string status) => status switch {
+        "Draft"     => "<span class=\"badge bg-secondary\">Draft</span>",
+        "Submitted" => "<span class=\"badge bg-warning text-dark\">Submitted</span>",
+        "Approved"  => "<span class=\"badge bg-success\">Approved</span>",
+        "Rejected"  => "<span class=\"badge bg-danger\">Rejected</span>",
+        _           => $"<span class=\"badge bg-light text-dark\">{status}</span>"
+    };
+}

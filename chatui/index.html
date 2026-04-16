@@ -1,0 +1,267 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>ExpenseTrack AI Assistant</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" />
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet" />
+    <style>
+        :root { --primary: #2563eb; --primary-dark: #1d4ed8; }
+        body { background: #f0f4ff; font-family: 'Segoe UI', system-ui, sans-serif; height: 100vh; display: flex; flex-direction: column; }
+
+        .chat-header {
+            background: linear-gradient(135deg, var(--primary) 0%, #7c3aed 100%);
+            color: white; padding: 1rem 1.5rem;
+            display: flex; align-items: center; gap: 1rem;
+        }
+        .chat-header .avatar {
+            width: 44px; height: 44px; background: rgba(255,255,255,0.2);
+            border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.4rem;
+        }
+        .chat-messages {
+            flex: 1; overflow-y: auto; padding: 1.5rem;
+            display: flex; flex-direction: column; gap: 1rem;
+        }
+        .message { display: flex; gap: 0.75rem; max-width: 85%; }
+        .message.user { align-self: flex-end; flex-direction: row-reverse; }
+        .message.assistant { align-self: flex-start; }
+        .message-avatar {
+            width: 36px; height: 36px; border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 1rem; flex-shrink: 0;
+        }
+        .user .message-avatar { background: var(--primary); color: white; }
+        .assistant .message-avatar { background: #e0e7ff; color: var(--primary); }
+        .message-bubble {
+            padding: 0.75rem 1rem; border-radius: 18px;
+            max-width: 100%; word-break: break-word;
+            line-height: 1.5;
+        }
+        .user .message-bubble { background: var(--primary); color: white; border-bottom-right-radius: 4px; }
+        .assistant .message-bubble { background: white; border: 1px solid #e2e8f0; border-bottom-left-radius: 4px; box-shadow: 0 1px 3px rgba(0,0,0,0.06); }
+        .message-bubble ol, .message-bubble ul { padding-left: 1.5rem; margin: 0.5rem 0; }
+        .message-bubble li { margin-bottom: 0.25rem; }
+
+        .typing-indicator { display: flex; gap: 4px; padding: 0.5rem 0; }
+        .typing-indicator span { width: 8px; height: 8px; background: #94a3b8; border-radius: 50%; animation: bounce 1.2s infinite; }
+        .typing-indicator span:nth-child(2) { animation-delay: 0.2s; }
+        .typing-indicator span:nth-child(3) { animation-delay: 0.4s; }
+        @keyframes bounce { 0%,60%,100% { transform: translateY(0); } 30% { transform: translateY(-8px); } }
+
+        .chat-input-area {
+            padding: 1rem 1.5rem; background: white;
+            border-top: 1px solid #e2e8f0;
+        }
+        .chat-input-area .input-group { border-radius: 24px; overflow: hidden; border: 2px solid #e2e8f0; transition: border-color 0.2s; }
+        .chat-input-area .input-group:focus-within { border-color: var(--primary); }
+        .chat-input-area textarea { border: none; resize: none; padding: 0.75rem 1rem; box-shadow: none !important; font-size: 0.95rem; }
+        .chat-input-area .btn-send { border: none; border-radius: 0; background: var(--primary); color: white; padding: 0 1.25rem; }
+        .chat-input-area .btn-send:hover { background: var(--primary-dark); }
+
+        .suggestion-chips { display: flex; flex-wrap: wrap; gap: 0.5rem; margin-bottom: 0.75rem; }
+        .chip { background: #eff6ff; color: var(--primary); border: 1px solid #bfdbfe; border-radius: 20px; padding: 0.3rem 0.85rem; font-size: 0.82rem; cursor: pointer; transition: all 0.15s; }
+        .chip:hover { background: var(--primary); color: white; }
+    </style>
+</head>
+<body>
+
+<div class="chat-header">
+    <div class="avatar"><i class="bi bi-robot"></i></div>
+    <div>
+        <div class="fw-bold fs-5">ExpenseTrack AI</div>
+        <div style="opacity:0.8; font-size:0.82rem;">Ask me about your expenses, approvals or summaries</div>
+    </div>
+    <div class="ms-auto">
+        <a href="/" class="btn btn-sm btn-outline-light"><i class="bi bi-arrow-left me-1"></i>Back to App</a>
+    </div>
+</div>
+
+<div class="chat-messages" id="chatMessages">
+    <!-- Welcome message -->
+    <div class="message assistant">
+        <div class="message-avatar"><i class="bi bi-robot"></i></div>
+        <div class="message-bubble">
+            <strong>👋 Hello! I'm your Expense Management AI assistant.</strong><br><br>
+            I can help you:
+            <ul>
+                <li>View and filter expense claims</li>
+                <li>Check pending approvals</li>
+                <li>Create new expense entries</li>
+                <li>Get expense summaries and totals</li>
+                <li>Approve or reject expenses</li>
+            </ul>
+            What would you like to know?
+        </div>
+    </div>
+</div>
+
+<div class="chat-input-area">
+    <div class="suggestion-chips" id="chips">
+        <span class="chip" onclick="sendSuggestion(this)">Show all expenses</span>
+        <span class="chip" onclick="sendSuggestion(this)">List pending approvals</span>
+        <span class="chip" onclick="sendSuggestion(this)">Expense summary by status</span>
+        <span class="chip" onclick="sendSuggestion(this)">Show travel expenses</span>
+        <span class="chip" onclick="sendSuggestion(this)">What categories are available?</span>
+    </div>
+    <div class="input-group">
+        <textarea id="userInput" class="form-control" rows="1"
+                  placeholder="Ask about expenses, approvals, totals..."
+                  onkeydown="handleKeyDown(event)"></textarea>
+        <button class="btn-send" onclick="sendMessage()" title="Send">
+            <i class="bi bi-send-fill"></i>
+        </button>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+    // Detect base URL: if hosted on the app service, use same origin; otherwise use the API URL
+    // The chat UI calls the /api/chat endpoint on the main ASP.NET app
+    const API_BASE = window.location.origin.includes('localhost') || window.location.origin.includes('azurewebsites')
+        ? window.location.origin
+        : '';  // same origin
+
+    let chatHistory = [];
+
+    const messagesEl = document.getElementById('chatMessages');
+    const inputEl = document.getElementById('userInput');
+
+    function escapeHtml(text) {
+        const div = document.createElement('div');
+        div.appendChild(document.createTextNode(text));
+        return div.innerHTML;
+    }
+
+    function formatMessage(text) {
+        // Escape HTML first to prevent XSS
+        let escaped = escapeHtml(text);
+
+        // Convert markdown-style formatting to HTML
+        // Bold: **text** → <strong>text</strong>
+        escaped = escaped.replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>');
+
+        // Numbered lists: lines starting with "1. ", "2. " etc.
+        const lines = escaped.split('\n');
+        let inOl = false, inUl = false;
+        const result = [];
+
+        for (let line of lines) {
+            const olMatch = line.match(/^\d+\.\s+(.*)/);
+            const ulMatch = line.match(/^[-*]\s+(.*)/);
+
+            if (olMatch) {
+                if (!inOl) { if (inUl) { result.push('</ul>'); inUl = false; } result.push('<ol>'); inOl = true; }
+                result.push(`<li>${olMatch[1]}</li>`);
+            } else if (ulMatch) {
+                if (!inUl) { if (inOl) { result.push('</ol>'); inOl = false; } result.push('<ul>'); inUl = true; }
+                result.push(`<li>${ulMatch[1]}</li>`);
+            } else {
+                if (inOl) { result.push('</ol>'); inOl = false; }
+                if (inUl) { result.push('</ul>'); inUl = false; }
+                result.push(line === '' ? '<br>' : line + '<br>');
+            }
+        }
+        if (inOl) result.push('</ol>');
+        if (inUl) result.push('</ul>');
+
+        return result.join('');
+    }
+
+    function addMessage(role, text, isHtml = false) {
+        const div = document.createElement('div');
+        div.className = `message ${role}`;
+
+        const avatarIcon = role === 'user' ? 'bi-person-fill' : 'bi-robot';
+        const avatar = `<div class="message-avatar"><i class="bi ${avatarIcon}"></i></div>`;
+        const bubble = document.createElement('div');
+        bubble.className = 'message-bubble';
+
+        if (isHtml) {
+            bubble.innerHTML = formatMessage(text);
+        } else {
+            bubble.innerHTML = formatMessage(text);
+        }
+
+        div.innerHTML = avatar;
+        div.appendChild(bubble);
+        messagesEl.appendChild(div);
+        messagesEl.scrollTop = messagesEl.scrollHeight;
+        return div;
+    }
+
+    function showTyping() {
+        const div = document.createElement('div');
+        div.className = 'message assistant';
+        div.id = 'typing';
+        div.innerHTML = `
+            <div class="message-avatar"><i class="bi bi-robot"></i></div>
+            <div class="message-bubble">
+                <div class="typing-indicator">
+                    <span></span><span></span><span></span>
+                </div>
+            </div>`;
+        messagesEl.appendChild(div);
+        messagesEl.scrollTop = messagesEl.scrollHeight;
+    }
+
+    function hideTyping() {
+        document.getElementById('typing')?.remove();
+    }
+
+    async function sendMessage() {
+        const text = inputEl.value.trim();
+        if (!text) return;
+
+        inputEl.value = '';
+        inputEl.style.height = 'auto';
+        document.getElementById('chips').style.display = 'none';
+
+        addMessage('user', text);
+        chatHistory.push({ role: 'user', content: text });
+
+        showTyping();
+
+        try {
+            const response = await fetch(`${API_BASE}/api/chat`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ message: text, history: chatHistory.slice(-10) })
+            });
+
+            hideTyping();
+
+            if (!response.ok) {
+                const errData = await response.json().catch(() => ({}));
+                addMessage('assistant', `⚠️ Error ${response.status}: ${errData.error || 'Request failed. Please try again.'}`);
+                return;
+            }
+
+            const data = await response.json();
+            const reply = data.reply || 'I could not generate a response. Please try again.';
+            addMessage('assistant', reply, true);
+            chatHistory.push({ role: 'assistant', content: reply });
+
+        } catch (err) {
+            hideTyping();
+            addMessage('assistant', `⚠️ **Connection error:** Could not reach the API. Make sure the Expense Management app is running.\n\nError: ${err.message}`);
+        }
+    }
+
+    function sendSuggestion(chip) {
+        inputEl.value = chip.textContent;
+        sendMessage();
+    }
+
+    function handleKeyDown(e) {
+        if (e.key === 'Enter' && !e.shiftKey) {
+            e.preventDefault();
+            sendMessage();
+        }
+        // Auto-resize textarea
+        inputEl.style.height = 'auto';
+        inputEl.style.height = Math.min(inputEl.scrollHeight, 120) + 'px';
+    }
+</script>
+</body>
+</html>
