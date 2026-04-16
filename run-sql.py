@@ -63,7 +63,7 @@ def execute_sql_script(server, database, script_file):
                 if current_statement:
                     statements.append("\n".join(current_statement))
                     current_statement = []
-            elif stripped:
+            elif stripped and not stripped.startswith("--"):
                 current_statement.append(line)
 
         if current_statement:

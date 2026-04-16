@@ -168,7 +168,7 @@
         return result.join('');
     }
 
-    function addMessage(role, text, isHtml = false) {
+    function addMessage(role, text) {
         const div = document.createElement('div');
         div.className = `message ${role}`;
 
@@ -176,12 +176,8 @@
         const avatar = `<div class="message-avatar"><i class="bi ${avatarIcon}"></i></div>`;
         const bubble = document.createElement('div');
         bubble.className = 'message-bubble';
-
-        if (isHtml) {
-            bubble.innerHTML = formatMessage(text);
-        } else {
-            bubble.innerHTML = formatMessage(text);
-        }
+        // Always escape HTML first, then apply markdown formatting (prevents XSS)
+        bubble.innerHTML = formatMessage(text);
 
         div.innerHTML = avatar;
         div.appendChild(bubble);
@@ -239,7 +235,7 @@
 
             const data = await response.json();
             const reply = data.reply || 'I could not generate a response. Please try again.';
-            addMessage('assistant', reply, true);
+            addMessage('assistant', reply);
             chatHistory.push({ role: 'assistant', content: reply });
 
         } catch (err) {

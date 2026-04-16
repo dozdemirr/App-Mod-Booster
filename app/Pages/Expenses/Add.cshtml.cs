@@ -45,6 +45,12 @@ public class AddModel : PageModel
             return Page();
         }
 
+        if (expenseDate > DateTime.Today)
+        {
+            ErrorMessage = "Expense date cannot be in the future.";
+            return Page();
+        }
+
         var request = new CreateExpenseRequest
         {
             UserId = userId,
